@@ -74,6 +74,9 @@ function Workspace() {
             <button
               onClick={() => {
                 removeCookie('id');
+
+                // 쿠키가 남아있어서 해놓음
+                window.location.reload();
               }}
             >
               쿠키삭제
