@@ -31,7 +31,7 @@ function Login() {
   const loginSubmitHandler = async () => {
     if (isIdValidation && isPwValidation) {
       console.log('회원가입 유효성 테스트 완료');
-
+      console.log(process.env.REACT_APP_SERVER_URL);
       await axios
         .post(`${process.env.REACT_APP_SERVER_URL}/api/users/login`, {
           email: idInputValue,
@@ -44,10 +44,10 @@ function Login() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response.data.message === 'wrong password') {
+          if (error.response.data?.message === 'wrong password') {
             setIsPwValidation(false);
           }
-          if (error.response.data.message === 'unregister user') {
+          if (error.response.data?.message === 'unregister user') {
             setIsIdValidation(false);
           }
         });
