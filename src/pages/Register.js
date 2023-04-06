@@ -3,11 +3,20 @@ import styled from 'styled-components';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useCookies } from 'react-cookie';
+
 function Register() {
+  const navigate = useNavigate();
+  const [cookies] = useCookies('id');
   useEffect(() => {
     setTimeout(() => {
       setIsPageRendering(true);
     }, 10);
+    if (cookies.id === 'undefined') {
+      return;
+    } else {
+      navigate('/workspace');
+    }
   }, []);
   const [isIdLabelAnimation, setIsIdLabelAnimation] = useState(false);
   const [isPwLabelAnimation, setIsPwLabelAnimation] = useState(false);
@@ -20,7 +29,7 @@ function Register() {
   const [isIdValidation, setIsIdValidation] = useState(true);
   const [isPwValidation, setIsPwValidation] = useState(true);
   const [isUserNameValidation, setIsUserNameValidation] = useState(true);
-  const navigate = useNavigate();
+
   const emailReg = /[a-z0-9]+@[a-z]+\.[a-z]{2,3}|\.[a-z]{2,3}\.[a-z]{2,3}/;
   const PwReg = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,20}$/;
   return (

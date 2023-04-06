@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-
+import axios from 'axios';
+import { useCookies } from 'react-cookie';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faChevronLeft,
   faMagnifyingGlass,
   faCircleXmark,
 } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom';
+
 function Workspace() {
   const [isRightBoxOpen, setIsRightBoxOpen] = useState(false);
   const [isInboxOpen, setIsInboxOpen] = useState(false);
   const [searchInputValue, setSearchInputValue] = useState('');
   const [isPageShow, setIsPageShow] = useState(false);
-
+  const [cookies, removeCookie] = useCookies(['id']);
+  const navigate = useNavigate();
   const statusBox = [
     '근무',
     '회의',
@@ -30,9 +34,15 @@ function Workspace() {
       setIsPageShow(true);
     }, 100);
   }, []);
+  useEffect(() => {
+    if (cookies.id === 'undefined') {
+      navigate('/');
+    }
+  }, [cookies]);
   return (
     <LayOut isPageShow={isPageShow}>
       {/* width 변경 막기위해 Wrap으로 감쌈*/}
+
       <WorkspaceListBox>
         <Wrap>
           <Img imgSize="small"></Img>
@@ -61,6 +71,13 @@ function Workspace() {
             }}
           >
             <Button>관리자 페이지</Button>
+            <button
+              onClick={() => {
+                removeCookie('id');
+              }}
+            >
+              쿠키삭제
+            </button>
           </div>
         </WorkspaceTitleBox>
 

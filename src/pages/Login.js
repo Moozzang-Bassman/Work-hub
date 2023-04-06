@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
 import axios from 'axios';
 function Login() {
   const [isIdLabelAnimation, setIsIdLabelAnimation] = useState(false);
@@ -12,13 +13,46 @@ function Login() {
   const [isIdValidation, setIsIdValidation] = useState(true);
   const [isPwValidation, setIsPwValidation] = useState(true);
   const navigate = useNavigate();
+  const [cookies, setCookie] = useCookies(['id']);
 
   useEffect(() => {
     setTimeout(() => {
       setIsPageRendering(true);
     }, 10);
+
+    if (cookies.id === 'undefined') {
+      return;
+    } else {
+      navigate('/workspace');
+    }
   }, []);
   const emailReg = /[a-z0-9]+@[a-z]+\.[a-z]{2,3}|\.[a-z]{2,3}\.[a-z]{2,3}/;
+
+  const loginSubmitHandler = async () => {
+    if (isIdValidation && isPwValidation) {
+      console.log('회원가입 유효성 테스트 완료');
+
+      await axios
+        .post(`${process.env.REACT_APP_SERVER_URL}/api/users/login`, {
+          email: idInputValue,
+          password: pwInputValue,
+        })
+        .then((response) => {
+          setCookie('id', response.headers.authorization);
+          console.log('로그인 성공');
+          navigate('/workspace');
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error.response.data.message === 'wrong password') {
+            setIsPwValidation(false);
+          }
+          if (error.response.data.message === 'unregister user') {
+            setIsIdValidation(false);
+          }
+        });
+    }
+  };
 
   return (
     <Layout>
@@ -28,31 +62,9 @@ function Login() {
           <StP>이메일과 비밀번호를 입력해주세요!</StP>
         </TitleWrap>
         <form
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-
-            if (isIdValidation && isPwValidation) {
-              console.log('회원가입 유효성 테스트 완료');
-              // navigate('/workspace');
-              axios
-                .post(`${process.env.REACT_APP_SERVER_URL}/api/users/login`, {
-                  email: idInputValue,
-                  password: pwInputValue,
-                })
-                .then(function (response) {
-                  console.log(response);
-                  console.log('로그인 성공');
-                })
-                .catch(function (error) {
-                  console.log(error);
-                  if (error.response.data.message === 'wrong password') {
-                    setIsPwValidation(false);
-                  }
-                  if (error.response.data.message === 'unregister user') {
-                    setIsIdValidation(false);
-                  }
-                });
-            }
+            loginSubmitHandler();
           }}
         >
           <InputWrap>
